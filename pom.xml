@@ -20,6 +20,7 @@
     <versions.java>1.8</versions.java>
     <versions.kotlin>1.3.72</versions.kotlin>
 
+    <dependency.versions.jackson-module-kotlin>2.9.8</dependency.versions.jackson-module-kotlin>
     <dependency.versions.aws-lambda-java-core>1.2.0</dependency.versions.aws-lambda-java-core>
     <dependency.versions.slf4j>1.7.25</dependency.versions.slf4j>
     <dependency.versions.logback>1.2.3</dependency.versions.logback>
@@ -45,6 +46,11 @@
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-reflect</artifactId>
         <version>${versions.kotlin}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-kotlin</artifactId>
+        <version>${dependency.versions.jackson-module-kotlin}</version>
       </dependency>
 
       <!-- AWS dependencies -->
