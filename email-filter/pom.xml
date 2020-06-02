@@ -10,9 +10,9 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>email-receiver</artifactId>
+  <artifactId>email-filter</artifactId>
 
-  <name>AWS Lambda Layer Demo - Incoming email event receiver</name>
+  <name>AWS Lambda Layer Demo - Email filter</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

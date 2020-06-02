@@ -1,4 +1,4 @@
-package com.github.zoltanpal.demo.lambda.email.receiver.ses
+package com.github.zoltanpal.demo.lambda.email.filter.ses
 
 enum class EmailDisposition {
     STOP_RULE,

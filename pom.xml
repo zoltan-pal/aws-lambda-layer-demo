@@ -10,7 +10,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>email-receiver</module>
+    <module>email-filter</module>
     <module>email-confirmation-sender</module>
     <module>email-processor</module>
     <module>kotlin-lambda-commons</module>

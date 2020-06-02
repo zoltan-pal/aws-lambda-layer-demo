@@ -1,12 +1,12 @@
-package com.github.zoltanpal.demo.lambda.email.receiver
+package com.github.zoltanpal.demo.lambda.email.filter
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.github.zoltanpal.demo.lambda.email.receiver.ses.EmailDisposition
-import com.github.zoltanpal.demo.lambda.email.receiver.ses.event.SESEvent
-import com.github.zoltanpal.demo.lambda.email.receiver.ses.event.SESRecord
-import com.github.zoltanpal.demo.lambda.email.receiver.ses.event.VerdictStatus
+import com.github.zoltanpal.demo.lambda.email.filter.ses.EmailDisposition
+import com.github.zoltanpal.demo.lambda.email.filter.ses.event.SESEvent
+import com.github.zoltanpal.demo.lambda.email.filter.ses.event.SESRecord
+import com.github.zoltanpal.demo.lambda.email.filter.ses.event.VerdictStatus
 import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.InputStream
