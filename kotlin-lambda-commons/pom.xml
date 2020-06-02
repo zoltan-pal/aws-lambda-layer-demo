@@ -10,9 +10,9 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>kotlin-lambda-essentials</artifactId>
+  <artifactId>kotlin-lambda-commons</artifactId>
 
-  <name>AWS Lambda Layer Demo - Kotlin lambda essentials wrapper layer</name>
+  <name>AWS Lambda Layer Demo - Kotlin lambda commons wrapper layer</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

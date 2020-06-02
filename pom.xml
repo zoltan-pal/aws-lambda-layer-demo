@@ -13,7 +13,7 @@
     <module>email-receiver</module>
     <module>email-confirmation-sender</module>
     <module>email-processor</module>
-    <module>kotlin-lambda-essentials</module>
+    <module>kotlin-lambda-commons</module>
   </modules>
 
   <properties>
@@ -31,7 +31,7 @@
     <dependencies>
       <dependency>
         <groupId>com.github.zoltanpal.demo</groupId>
-        <artifactId>kotlin-lambda-essentials</artifactId>
+        <artifactId>kotlin-lambda-commons</artifactId>
         <version>${project.version}</version>
         <scope>provided</scope>
       </dependency>
