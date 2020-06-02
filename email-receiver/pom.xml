@@ -23,10 +23,6 @@
       <groupId>com.github.zoltanpal.demo</groupId>
       <artifactId>kotlin-lambda-essentials</artifactId>
     </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId>jackson-module-kotlin</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
