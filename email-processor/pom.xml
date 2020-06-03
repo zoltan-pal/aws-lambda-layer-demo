@@ -23,6 +23,14 @@
       <groupId>com.github.zoltanpal.demo</groupId>
       <artifactId>kotlin-lambda-commons</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-lambda-java-events</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-ses</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
