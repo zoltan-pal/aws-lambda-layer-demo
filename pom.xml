@@ -22,6 +22,8 @@
 
     <dependency.versions.jackson-module-kotlin>2.9.8</dependency.versions.jackson-module-kotlin>
     <dependency.versions.aws-lambda-java-core>1.2.0</dependency.versions.aws-lambda-java-core>
+    <dependency.versions.aws-lambda-java-events>2.2.7</dependency.versions.aws-lambda-java-events>
+    <dependency.versions.aws-java-sdk-ses>1.11.769</dependency.versions.aws-java-sdk-ses>
     <dependency.versions.slf4j>1.7.25</dependency.versions.slf4j>
     <dependency.versions.logback>1.2.3</dependency.versions.logback>
     <plugin.versions.maven-assembly-plugin>3.1.1</plugin.versions.maven-assembly-plugin>
@@ -58,6 +60,16 @@
         <groupId>com.amazonaws</groupId>
         <artifactId>aws-lambda-java-core</artifactId>
         <version>${dependency.versions.aws-lambda-java-core}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-lambda-java-events</artifactId>
+        <version>${dependency.versions.aws-lambda-java-events}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-ses</artifactId>
+        <version>${dependency.versions.aws-java-sdk-ses}</version>
       </dependency>
 
       <!-- Logging dependencies -->
