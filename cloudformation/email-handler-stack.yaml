@@ -1,0 +1,218 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Stack of the email handler resources"
+
+Parameters:
+
+  LambdaFunctionArtifactsBucketName:
+    Type: String
+    Default: email-handler-lambda-artifacts-bucket
+  LambdaLayerArtifactsBucketName:
+    Type: String
+    Default: lambda-layer-artifacts-bucket
+  EnvLambdaLogLevel:
+    Type: String
+    Default: DEBUG
+  EnvConfirmationSender:
+    Type: String
+    Default: change-me
+
+Resources:
+
+  # Set up lambda layer
+  KotlinCommonsLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: kotlin-lambda-commons-layer
+      Description: String
+      CompatibleRuntimes:
+        - java8
+      Content:
+        S3Bucket: !Sub ${LambdaLayerArtifactsBucketName}
+        S3Key: kotlin-lambda-commons.zip
+
+  # Generic logging related policy for the lambda functions
+  LambdaFunctionLoggingPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - "logs:CreateLogGroup"
+              - "logs:CreateLogStream"
+              - "logs:PutLogEvents"
+              - "logs:DescribeLogStreams"
+            Resource: "arn:aws:logs:*:*:*"
+
+  # Email filter lambda
+  EmailFilterLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: email-filter-lambda-function
+      Handler: com.github.zoltanpal.demo.lambda.email.filter.LambdaEntryPoint::handleRequest
+      Description: Filters emails received through SES.
+      Role: !GetAtt EmailFilterLambdaFunctionRole.Arn
+      Code:
+        S3Bucket: !Sub ${LambdaFunctionArtifactsBucketName}
+        S3Key: email-filter-1.0-SNAPSHOT.jar
+      Layers:
+        - !Ref KotlinCommonsLambdaLayer
+      Runtime: java8
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          FILTER_LAMBDA_LOG_LEVEL: !Ref EnvLambdaLogLevel
+  EmailFilterLambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: email-filter-lambda-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref LambdaFunctionLoggingPolicy
+      Path: "/"
+
+  EmailFilterLambdaFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref EmailFilterLambdaFunction
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  # Email handling rules
+  EmailFilterRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: email-filter-rule-set
+
+  EmailFilterReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    Properties:
+      RuleSetName: email-filter-rule-set
+      Rule:
+        ScanEnabled: true
+        Enabled: true
+        Name: email-filter-rule
+        Recipients:
+          - test@ses-demo.tk
+        Actions:
+          - LambdaAction:
+              FunctionArn: !GetAtt EmailFilterLambdaFunction.Arn
+              InvocationType: RequestResponse
+              TopicArn: !Ref EmailNotifier
+
+  # SNS topic for valid received emails
+  EmailNotifier:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: incoming-email-notifier
+      Subscription:
+        - Endpoint: !GetAtt EmailConfirmationSenderLambdaFunction.Arn
+          Protocol: lambda
+        - Endpoint: !GetAtt EmailProcessorLambdaFunction.Arn
+          Protocol: lambda
+
+  # Email confirmation sender lambda
+  EmailConfirmationSenderLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: email-confirmation-sender-lambda-function
+      Handler: com.github.zoltanpal.demo.lambda.email.confirmation.sender.LambdaEntryPoint::handleRequest
+      Description: Sends confirmation emails using SES.
+      Role: !GetAtt EmailConfirmationSenderLambdaFunctionRole.Arn
+      Code:
+        S3Bucket: !Sub ${LambdaFunctionArtifactsBucketName}
+        S3Key: email-confirmation-sender-1.0-SNAPSHOT.jar
+      Layers:
+        - !Ref KotlinCommonsLambdaLayer
+      Runtime: java8
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          CONFIRMATION_SENDER_LAMBDA_LOG_LEVEL: !Ref EnvLambdaLogLevel
+          CONFIRMATION_SENDER: !Ref EnvConfirmationSender
+  EmailConfirmationSenderLambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: email-confirmation-sender-lambda-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: dynamodb-sync-lambda-role-logging-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "ses:SendEmail"
+                  - "ses:SendRawEmail"
+                Resource: "arn:aws:ses:*:*:*"
+      ManagedPolicyArns:
+        - !Ref LambdaFunctionLoggingPolicy
+      Path: "/"
+  EmailConfirmationSenderLambdaFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref EmailConfirmationSenderLambdaFunction
+      Principal: sns.amazonaws.com
+
+  # Email processor lambda
+  EmailProcessorLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: email-processor-lambda-function
+      Handler: com.github.zoltanpal.demo.lambda.email.processor.LambdaEntryPoint::handleRequest
+      Description: Processes emails received through SES.
+      Role: !GetAtt EmailProcessorLambdaFunctionRole.Arn
+      Code:
+        S3Bucket: !Sub ${LambdaFunctionArtifactsBucketName}
+        S3Key: email-processor-1.0-SNAPSHOT.jar
+      Layers:
+        - !Ref KotlinCommonsLambdaLayer
+      Runtime: java8
+      Timeout: 30
+      MemorySize: 512
+      Environment:
+        Variables:
+          PROCESSOR_LAMBDA_LOG_LEVEL: !Ref EnvLambdaLogLevel
+  EmailProcessorLambdaFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: email-processor-lambda-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref LambdaFunctionLoggingPolicy
+      Path: "/"
+  EmailProcessorLambdaFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref EmailProcessorLambdaFunction
+      Principal: sns.amazonaws.com
