@@ -23,12 +23,13 @@ class LambdaEntryPoint : RequestStreamHandler {
         @JvmStatic private val LOGGER = LoggerFactory.getLogger(LambdaEntryPoint::class.java)
     }
 
+    private val objectMapper = jacksonObjectMapper()
+
     override fun handleRequest(inputStream: InputStream, outputStream: OutputStream, lambdaContext: Context) {
         LOGGER.info("Handling incoming email...")
-        val mapper = jacksonObjectMapper()
         val jsonString = inputStream.bufferedReader().use(BufferedReader::readText)
         LOGGER.debug("Incoming JSON={}", jsonString)
-        val event = mapper.readValue(jsonString, SESEvent::class.java)
+        val event = objectMapper.readValue(jsonString, SESEvent::class.java)
         LOGGER.debug("Parsed SES event={}", event)
         val filterResult = filterEmail(event.records[0])
         LOGGER.info("Email filter result for disposition={}", filterResult)
