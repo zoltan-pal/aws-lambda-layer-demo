@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Stack for storing artifacts related to the email handler"
+
+Parameters:
+
+  LambdaFunctionArtifactsBucketName:
+    Type: String
+    Default: email-handler-lambda-artifacts-bucket
+  LambdaLayerArtifactsBucketName:
+    Type: String
+    Default: lambda-layer-artifacts-bucket
+
+Resources:
+
+  # Set up storage for email handler lambda artifacts
+  EmailHandlerLambdaArtifactsBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub ${LambdaFunctionArtifactsBucketName}
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Suspended
+    DeletionPolicy: Delete
+  EmailHandlerLambdaArtifactsBucketAccessPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EmailHandlerLambdaArtifactsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: !Sub "${LambdaFunctionArtifactsBucketName}-user-access"
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::709105430508:user/user"
+            Action: "s3:*"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref EmailHandlerLambdaArtifactsBucket
+                - "/*"
+
+  # Set up storage for lambda layer artifacts
+  LambdaLayerArtifactsBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub ${LambdaLayerArtifactsBucketName}
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Suspended
+    DeletionPolicy: Delete
+  LambdaLayerArtifactsBucketAccessPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LambdaLayerArtifactsBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: !Sub "${LambdaLayerArtifactsBucketName}-user-access"
+            Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::709105430508:user/user"
+            Action: "s3:*"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref LambdaLayerArtifactsBucket
+                - "/*"
