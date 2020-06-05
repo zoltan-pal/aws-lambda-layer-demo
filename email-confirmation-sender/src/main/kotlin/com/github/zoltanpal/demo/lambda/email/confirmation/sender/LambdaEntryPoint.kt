@@ -11,6 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 
+/**
+ * The entry point for the confirmation email sender lambda function.
+ * Sends confirmation email to the original sender.
+ */
 class LambdaEntryPoint : RequestHandler<SNSEvent, Void> {
 
     companion object {

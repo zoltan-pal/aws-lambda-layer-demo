@@ -6,6 +6,12 @@ import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.slf4j.LoggerFactory
 
+/**
+ * The entry point for the email processor lambda function.
+ * Does not do any processing, it is just here for the sake of
+ * demonstrating multiple functions being triggered from SNS
+ * and how lambda layers are shared across multiple functions.
+ */
 class LambdaEntryPoint : RequestHandler<SNSEvent, Void> {
 
     companion object {
